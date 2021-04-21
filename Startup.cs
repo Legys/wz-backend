@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WzBeatsApi;
 
 namespace wz_backend
 {
@@ -27,6 +28,7 @@ namespace wz_backend
     public void ConfigureServices(IServiceCollection services)
     {
 
+      Ioc ioc = new Ioc(services);
       services.AddControllers();
       services.AddSwaggerGen(c =>
       {

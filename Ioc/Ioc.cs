@@ -6,10 +6,16 @@ namespace WzBeatsApi
 {
   public class Ioc
   {
-    public void registerServices(IServiceCollection services)
+    public IServiceCollection _services;
+    public Ioc(IServiceCollection services)
     {
-      services.AddDbContext<WzBeatsApiContext>(opt =>
-                                               opt.UseInMemoryDatabase("WzBeats"));
+      this._services = services;
+      this.registerServices();
+    }
+    public void registerServices()
+    {
+      this._services.AddDbContext<WzBeatsApiContext>(opt =>
+                                                     opt.UseInMemoryDatabase("WzBeats"));
     }
   }
 }
