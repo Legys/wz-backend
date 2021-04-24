@@ -80,7 +80,7 @@ namespace WzBeatsApi.Controllers
       _context.TrackItems.Add(trackItem);
       await _context.SaveChangesAsync();
 
-      return CreatedAtAction("GetTrackItem", new { id = trackItem.Id }, trackItem);
+      return CreatedAtAction(nameof(GetTrackItem), new { id = trackItem.Id }, trackItem);
     }
 
     // DELETE: api/TrackItems/5
