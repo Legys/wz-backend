@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WzBeatsApi.Models;
 
-namespace wz_backend.Controllers
+namespace WzBeatsApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

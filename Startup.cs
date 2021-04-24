@@ -11,9 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using WzBeatsApi;
 
-namespace wz_backend
+namespace WzBeatsApi
 {
   public class Startup
   {
