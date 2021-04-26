@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WzBeatsApi.Models;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace wz_backend.Controllers.AssetItemsController
 {
@@ -14,10 +16,12 @@ namespace wz_backend.Controllers.AssetItemsController
   public class AssetItemsController : ControllerBase
   {
     private readonly WzBeatsApiContext _context;
+    private readonly IWebHostEnvironment _appEnv;
 
-    public AssetItemsController(WzBeatsApiContext context)
+    public AssetItemsController(WzBeatsApiContext context, IWebHostEnvironment appEnv)
     {
       _context = context;
+      _appEnv = appEnv;
     }
 
     // GET: api/AssetItems
@@ -75,12 +79,58 @@ namespace wz_backend.Controllers.AssetItemsController
     // POST: api/AssetItems
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<AssetItem>> PostAssetItem(AssetItem assetItem)
+    public async Task<ActionResult<AssetItem>> PostAssetItem(IFormFile file)
     {
-      _context.AssetItems.Add(assetItem);
-      await _context.SaveChangesAsync();
+      System.Console.Write(_appEnv.WebRootPath);
 
-      return CreatedAtAction("GetAssetItem", new { id = assetItem.Id }, assetItem);
+      try
+      {
+        if (file.Length > 0)
+        {
+          string fileExtension = Path.GetExtension(file.FileName);
+
+          AssetType fileType;
+          string webStorageAssetFolder;
+
+          switch (fileExtension)
+          {
+            case ".mp3":
+              fileType = AssetType.Track;
+              webStorageAssetFolder = "assets/tracks/";
+              break;
+            case ".jpg":
+            case ".png":
+              fileType = AssetType.Cover;
+              webStorageAssetFolder = "assets/images/";
+              break;
+            default:
+              throw new Exception("Wrong asset file extension");
+
+          }
+          var storePath = Path.Combine(_appEnv.WebRootPath, webStorageAssetFolder);
+          var fullPath = storePath + file.FileName;
+
+          using (var stream = System.IO.File.Create(fullPath))
+          {
+            await file.CopyToAsync(stream);
+
+            AssetItem assetItem = new AssetItem(file.FileName, fileType, fullPath);
+
+            _context.AssetItems.Add(assetItem);
+            return CreatedAtAction(nameof(GetAssetItem), new
+            {
+              id = assetItem.Id
+            }, assetItem);
+          }
+        }
+        return Problem("Empty file", null, 400);
+      }
+
+      catch (Exception e)
+      {
+        return Problem(e.ToString(), null, 400);
+      }
+
     }
 
     // DELETE: api/AssetItems/5
