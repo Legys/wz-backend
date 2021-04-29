@@ -81,8 +81,6 @@ namespace wz_backend.Controllers.AssetItemsController
     [HttpPost]
     public async Task<ActionResult<AssetItem>> PostAssetItem(IFormFile file)
     {
-      System.Console.Write(_appEnv.WebRootPath);
-
       try
       {
         if (file.Length > 0)
