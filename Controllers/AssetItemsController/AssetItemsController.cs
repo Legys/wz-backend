@@ -93,6 +93,7 @@ namespace wz_backend.Controllers.AssetItemsController
           switch (fileExtension)
           {
             case ".mp3":
+            case ".wav":
               fileType = AssetType.Track;
               webStorageAssetFolder = "assets/tracks/";
               break;
@@ -115,6 +116,7 @@ namespace wz_backend.Controllers.AssetItemsController
             AssetItem assetItem = new AssetItem(file.FileName, fileType, fullPath);
 
             _context.AssetItems.Add(assetItem);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAssetItem), new
             {
               id = assetItem.Id

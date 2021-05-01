@@ -11,6 +11,9 @@ namespace WzBeatsApi.Models
 
     public DbSet<TrackItem> TrackItems { get; set; }
     public DbSet<AssetItem> AssetItems { get; set; }
-
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+      optionsBuilder.EnableSensitiveDataLogging();
+    }
   }
 }

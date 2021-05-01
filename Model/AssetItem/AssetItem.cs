@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+// using System.ComponentModel.DataAnnotations;
 
 namespace WzBeatsApi.Models
 {
@@ -9,7 +10,9 @@ namespace WzBeatsApi.Models
     public AssetType Type { get; set; }
     public string Url { get; set; }
 
-    [ForeignKey("Id")]
+    // [ForeignKey("Id")]
+    [NotMapped]
+    // public long TrackItemId { get; set; }
     public TrackItem TrackItem { get; set; }
 
     public AssetItem(string Title, AssetType Type, string Url)

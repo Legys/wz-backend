@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WzBeatsApi.Models;
+using System.Text.Json;
 
 namespace WzBeatsApi.Controllers
 {
@@ -14,10 +15,12 @@ namespace WzBeatsApi.Controllers
   public class TrackItemsController : ControllerBase
   {
     private readonly WzBeatsApiContext _context;
+    private readonly UploadAssetService _uploadAssetService;
 
-    public TrackItemsController(WzBeatsApiContext context)
+    public TrackItemsController(WzBeatsApiContext context, UploadAssetService uploadAssetService)
     {
       _context = context;
+      _uploadAssetService = uploadAssetService;
     }
 
     // GET: api/TrackItems
@@ -44,12 +47,17 @@ namespace WzBeatsApi.Controllers
     // PUT: api/TrackItems/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutTrackItem(long id, TrackItem trackItem)
+    public async Task<IActionResult> PutTrackItem(long id, TrackItemDTO trackItemDTO)
+
     {
-      if (id != trackItem.Id)
+      if (id != trackItemDTO.Id)
       {
         return BadRequest();
       }
+
+      AssetItem coverAsset = await _uploadAssetService.HandleUpload(trackItemDTO.CoverAsset);
+      AssetItem trackAsset = await _uploadAssetService.HandleUpload(trackItemDTO.TrackAsset);
+      TrackItem trackItem = new TrackItem(trackItemDTO.Title, trackItemDTO.Description, trackItemDTO.Bpm, trackItemDTO.SongKey, trackItemDTO.Genre, trackAsset, coverAsset);
 
       _context.Entry(trackItem).State = EntityState.Modified;
 
@@ -75,12 +83,36 @@ namespace WzBeatsApi.Controllers
     // POST: api/TrackItems
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<TrackItem>> PostTrackItem(TrackItem trackItem)
+    public async Task<ActionResult<TrackItemDTO>> PostTrackItem([FromForm] TrackItemDTO trackItemDTO)
     {
-      _context.TrackItems.Add(trackItem);
-      await _context.SaveChangesAsync();
+      try
+      {
+        AssetItem coverAsset = await _uploadAssetService.HandleUpload(trackItemDTO.CoverAsset);
+        AssetItem trackAsset = await _uploadAssetService.HandleUpload(trackItemDTO.TrackAsset);
+        TrackItem trackItem = new TrackItem(trackItemDTO.Title, trackItemDTO.Description, trackItemDTO.Bpm, trackItemDTO.SongKey, trackItemDTO.Genre, trackAsset, coverAsset);
+        Console.WriteLine("TRACK item:");
+        var json = JsonSerializer.Serialize(trackItem);
+        Console.WriteLine(json);
 
-      return CreatedAtAction(nameof(GetTrackItem), new { id = trackItem.Id }, trackItem);
+        _context.TrackItems.Add(trackItem);
+
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetTrackItem), new { id = trackItem.Id }, trackItem);
+      }
+
+      catch (Exception e)
+      {
+        switch (e.ToString())
+        {
+          case "Empty file":
+            return Problem(e.ToString(), null, 400);
+          case "Wrong asset file extension":
+            return Problem(e.ToString(), null, 400);
+          default:
+            return Problem(e.ToString(), null, 500);
+        }
+      }
     }
 
     // DELETE: api/TrackItems/5

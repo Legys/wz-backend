@@ -16,6 +16,7 @@ namespace WzBeatsApi
     {
       this._services.AddDbContext<WzBeatsApiContext>(opt =>
                                                      opt.UseInMemoryDatabase("WzBeats"));
+      this._services.AddScoped<WzBeatsApi.Controllers.UploadAssetService>();
     }
   }
 }
