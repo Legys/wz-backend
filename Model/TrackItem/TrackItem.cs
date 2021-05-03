@@ -1,44 +1,50 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
+using AutoMapper;
+using System.Linq;
+using System;
 
 namespace WzBeatsApi.Models
 {
   public class TrackItem
   {
     public long Id { get; set; }
-    [Required]
     public string Title { get; set; }
-    [Required]
     public string Description { get; set; }
-    [Required]
     public string Bpm { get; set; }
-    [Required]
     public string SongKey { get; set; }
-    [Required]
     public string Genre { get; set; }
     public bool IsSold { get; set; }
     public int Listeners { get; set; }
     public int Likes { get; set; }
+    public ICollection<AssetItem> Assets { get; set; }
 
-    public AssetItem TrackAsset { get; set; }
-    public long TrackAssetId { get; set; }
-    public AssetItem CoverAsset { get; set; }
-    public long CoverAssetId { get; set; }
+    public static TrackItemResponse MapIndexResponse(TrackItem trackItem)
+    {
+      var config = new MapperConfiguration(cfg =>
+      {
+        cfg.CreateMap<TrackItem, TrackItemResponse>()
+          .ForMember("CoverAsset", opt => opt.MapFrom(ti => ti.Assets.ToList().Find(a => a.Type == AssetType.Cover)))
+          .ForMember("TrackAsset", opt => opt.MapFrom(ti => ti.Assets.ToList().Find(a => a.Type == AssetType.Track)));
+
+        cfg.CreateMap<AssetItem, AssetItemResponse>();
+      });
+
+      var mapper = config.CreateMapper();
+      return mapper.Map<TrackItemResponse>(trackItem);
+    }
 
     public TrackItem() { }
 
-    public TrackItem(string Title, string Description, string Bpm, string SongKey, string Genre, AssetItem TrackAsset, AssetItem CoverAsset)
+    public TrackItem(string Title, string Description, string Bpm, string SongKey, string Genre, ICollection<AssetItem> Assets)
     {
       this.Title = Title;
       this.Description = Description;
       this.Bpm = Bpm;
       this.SongKey = SongKey;
       this.Genre = Genre;
-      this.TrackAsset = TrackAsset;
-      this.CoverAsset = CoverAsset;
+      this.Assets = Assets;
     }
-
   }
 }

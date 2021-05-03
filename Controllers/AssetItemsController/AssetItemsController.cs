@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using WzBeatsApi.Models;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+// using System.Linq;
 
 namespace wz_backend.Controllers.AssetItemsController
 {
@@ -26,23 +27,28 @@ namespace wz_backend.Controllers.AssetItemsController
 
     // GET: api/AssetItems
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AssetItem>>> GetAssetItems()
+    public async Task<ActionResult<IEnumerable<AssetItemResponse>>> GetAssetItems()
     {
-      return await _context.AssetItems.ToListAsync();
+      return await _context.AssetItems
+      .Include(ai => ai.TrackItem)
+      .Select(ai => AssetItem.MapIndexResponse(ai))
+      .ToListAsync();
     }
 
     // GET: api/AssetItems/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<AssetItem>> GetAssetItem(long id)
+    public async Task<ActionResult<AssetItemResponse>> GetAssetItem(long id)
     {
-      var assetItem = await _context.AssetItems.FindAsync(id);
+      var assetItem = await _context.AssetItems
+        .Include(ai => ai.TrackItem)
+        .FirstOrDefaultAsync(ai => ai.Id == id);
 
       if (assetItem == null)
       {
         return NotFound();
       }
 
-      return assetItem;
+      return AssetItem.MapIndexResponse(assetItem);
     }
 
     // PUT: api/AssetItems/5

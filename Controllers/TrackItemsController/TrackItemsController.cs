@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WzBeatsApi.Models;
-using System.Text.Json;
 
 namespace WzBeatsApi.Controllers
 {
@@ -25,9 +24,12 @@ namespace WzBeatsApi.Controllers
 
     // GET: api/TrackItems
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TrackItem>>> GetTrackItems()
+    public async Task<ActionResult<IEnumerable<TrackItemResponse>>> GetTrackItems()
     {
-      return await _context.TrackItems.ToListAsync();
+      return await _context.TrackItems
+        .Include(ti => ti.Assets)
+        .Select(ti => TrackItem.MapIndexResponse(ti))
+        .ToListAsync();
     }
 
     // GET: api/TrackItems/5
@@ -55,11 +57,14 @@ namespace WzBeatsApi.Controllers
         return BadRequest();
       }
 
-      AssetItem coverAsset = await _uploadAssetService.HandleUpload(trackItemDTO.CoverAsset);
-      AssetItem trackAsset = await _uploadAssetService.HandleUpload(trackItemDTO.TrackAsset);
-      TrackItem trackItem = new TrackItem(trackItemDTO.Title, trackItemDTO.Description, trackItemDTO.Bpm, trackItemDTO.SongKey, trackItemDTO.Genre, trackAsset, coverAsset);
+      // AssetItem coverAsset = await _uploadAssetService.HandleUpload(trackItemDTO.CoverAsset);
+      // AssetItem trackAsset = await _uploadAssetService.HandleUpload(trackItemDTO.TrackAsset);
+      // TrackItem trackItem = new TrackItem(trackItemDTO.Title, trackItemDTO.Description, trackItemDTO.Bpm, trackItemDTO.SongKey, trackItemDTO.Genre, trackAsset.Id, trackAsset, coverAsset.Id, coverAsset
+      // //  new List<AssetItem> { trackAsset, coverAsset }
 
-      _context.Entry(trackItem).State = EntityState.Modified;
+      //  );
+
+      // _context.Entry(trackItem).State = EntityState.Modified;
 
       try
       {
@@ -89,16 +94,14 @@ namespace WzBeatsApi.Controllers
       {
         AssetItem coverAsset = await _uploadAssetService.HandleUpload(trackItemDTO.CoverAsset);
         AssetItem trackAsset = await _uploadAssetService.HandleUpload(trackItemDTO.TrackAsset);
-        TrackItem trackItem = new TrackItem(trackItemDTO.Title, trackItemDTO.Description, trackItemDTO.Bpm, trackItemDTO.SongKey, trackItemDTO.Genre, trackAsset, coverAsset);
-        Console.WriteLine("TRACK item:");
-        var json = JsonSerializer.Serialize(trackItem);
-        Console.WriteLine(json);
+        TrackItem trackItem = new TrackItem(trackItemDTO.Title, trackItemDTO.Description, trackItemDTO.Bpm, trackItemDTO.SongKey,
+          trackItemDTO.Genre, new List<AssetItem>() { trackAsset, coverAsset });
 
         _context.TrackItems.Add(trackItem);
 
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetTrackItem), new { id = trackItem.Id }, trackItem);
+        return CreatedAtAction(nameof(GetTrackItem), new { id = trackItem.Id }, TrackItem.MapIndexResponse(trackItem));
       }
 
       catch (Exception e)

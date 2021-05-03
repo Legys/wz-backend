@@ -16,6 +16,9 @@ namespace WzBeatsApi
     {
       this._services.AddDbContext<WzBeatsApiContext>(opt =>
                                                      opt.UseInMemoryDatabase("WzBeats"));
+      //   this._services.AddControllers().AddNewtonsoftJson(options =>
+      //     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+      // );
       this._services.AddScoped<WzBeatsApi.Controllers.UploadAssetService>();
     }
   }
