@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WzBeatsApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace WzBeatsApi
 {
@@ -28,6 +30,9 @@ namespace WzBeatsApi
     {
 
       Ioc ioc = new Ioc(services);
+      services.AddDbContext<WzBeatsApiContext>(opt =>
+                                               opt.UseSqlite(Configuration.GetConnectionString("WzBeatsApiDatabase")));
+
       services.AddControllers();
       services.AddSwaggerGen(c =>
       {

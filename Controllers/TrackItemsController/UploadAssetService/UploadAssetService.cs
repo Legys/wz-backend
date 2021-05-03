@@ -11,7 +11,7 @@ namespace WzBeatsApi.Controllers
   {
     private readonly IWebHostEnvironment _appEnv;
 
-    public UploadAssetService(WzBeatsApiContext context, IWebHostEnvironment appEnv)
+    public UploadAssetService(IWebHostEnvironment appEnv)
     {
       _appEnv = appEnv;
     }
