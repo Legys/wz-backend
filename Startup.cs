@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WzBeatsApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace WzBeatsApi
 {
@@ -39,6 +40,12 @@ namespace WzBeatsApi
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "wz_backend", Version = "v1" });
       });
 
+      services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+          options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+        });
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +63,7 @@ namespace WzBeatsApi
       app.UseRouting();
 
       app.UseAuthorization();
+      app.UseAuthentication();
 
       app.UseEndpoints(endpoints =>
       {
