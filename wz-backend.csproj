@@ -3,6 +3,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>wz_backend</RootNamespace>
     <UserSecretsId>968c2fc1-a433-4bc9-85d1-39f2617a49e8</UserSecretsId>
+    <!-- <Nullable>enable</Nullable> -->
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />

@@ -6,6 +6,7 @@ using System.Security.Claims;
 using WzBeatsApi.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System;
 
 namespace wz_backend.Controllers.AuthController
 {
@@ -26,7 +27,7 @@ namespace wz_backend.Controllers.AuthController
       User user = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname && u.Password == model.Password);
       if (user != null)
       {
-        await Authenticate(model.Nickname);
+        await Authenticate(model.Nickname, user.IsAdmin);
 
         return user;
 
@@ -44,7 +45,7 @@ namespace wz_backend.Controllers.AuthController
         _context.Users.Add(new User(model.Nickname, model.Password, false));
         await _context.SaveChangesAsync();
 
-        await Authenticate(model.Nickname);
+        await Authenticate(model.Nickname, user.IsAdmin);
 
       }
       User newUser = await _context.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname && u.Password == model.Password);
@@ -52,12 +53,14 @@ namespace wz_backend.Controllers.AuthController
 
     }
 
-    private async Task Authenticate(string userName)
+    private async Task Authenticate(string userName, bool isAdmin)
     {
       var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
-            };
+        {
+          new Claim(ClaimsIdentity.DefaultNameClaimType, userName),
+          new Claim(ClaimsIdentity.DefaultRoleClaimType, isAdmin ? "admin" : "user" ),
+        };
+
       ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
       await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
     }

@@ -10,5 +10,11 @@ namespace WzBeatsApi.Models
     [Required(ErrorMessage = "Password is missing")]
     [DataType(DataType.Password)]
     public string Password { get; set; }
+
+    public UserLogin(string Nickname, string Password)
+    {
+      this.Nickname = Nickname;
+      this.Password = Password;
+    }
   }
 }
