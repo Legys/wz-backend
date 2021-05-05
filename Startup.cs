@@ -41,10 +41,7 @@ namespace WzBeatsApi
       });
 
       services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-        .AddCookie(options =>
-        {
-          options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
-        });
+        .AddCookie();
 
     }
 
@@ -62,8 +59,8 @@ namespace WzBeatsApi
 
       app.UseRouting();
 
-      app.UseAuthorization();
       app.UseAuthentication();
+      app.UseAuthorization();
 
       app.UseEndpoints(endpoints =>
       {

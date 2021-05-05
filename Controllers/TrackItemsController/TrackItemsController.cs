@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WzBeatsApi.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace WzBeatsApi.Controllers
 {
@@ -49,6 +51,7 @@ namespace WzBeatsApi.Controllers
     // PUT: api/TrackItems/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> PutTrackItem(long id, TrackItemDTO trackItemDTO)
 
     {
@@ -88,6 +91,7 @@ namespace WzBeatsApi.Controllers
     // POST: api/TrackItems
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult<TrackItemDTO>> PostTrackItem([FromForm] TrackItemDTO trackItemDTO)
     {
       try
