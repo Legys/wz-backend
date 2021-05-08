@@ -26,9 +26,42 @@ namespace WzBeatsApi.Controllers
 
     // GET: api/TrackItems
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TrackItemResponse>>> GetTrackItems()
+    public async Task<ActionResult<IEnumerable<TrackItemResponse>>> GetTrackItems(string search, string genre, string mood, string sort, int bpm)
     {
-      return await _context.TrackItems
+      var trackItems = from ti in _context.TrackItems
+                       select ti;
+
+      switch (sort)
+      {
+        case "asc":
+          trackItems = trackItems.OrderBy(ti => ti.CreatedAt);
+          break;
+        default:
+          trackItems = trackItems.OrderByDescending(ti => ti.CreatedAt);
+          break;
+      }
+
+      if (genre != null)
+      {
+        trackItems = trackItems.Where(ti => ti.Genre.Contains(search, StringComparison.OrdinalIgnoreCase));
+      }
+
+      if (mood != null)
+      {
+        trackItems = trackItems.Where(ti => ti.Mood.Contains(mood, StringComparison.OrdinalIgnoreCase));
+      }
+
+      if (search != null)
+      {
+        trackItems = trackItems.Where(ti => ti.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+      }
+
+      if (bpm != 0)
+      {
+        trackItems = trackItems.Where(ti => Enumerable.Range(bpm - 7, bpm + 7).Contains(ti.Bpm));
+      }
+
+      return await trackItems
         .Include(ti => ti.Assets)
         .Select(ti => TrackItem.MapIndexResponse(ti))
         .ToListAsync();

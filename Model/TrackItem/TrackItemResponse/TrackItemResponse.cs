@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
-
+using System;
 
 namespace WzBeatsApi.Models
 {
@@ -13,10 +10,15 @@ namespace WzBeatsApi.Models
 
     public string Description { get; set; }
 
-    public string Bpm { get; set; }
+    public int Bpm { get; set; }
     public string SongKey { get; set; }
 
     public string Genre { get; set; }
+
+    public string Mood { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
 
     public AssetItemResponse CoverAsset { get; set; }
 

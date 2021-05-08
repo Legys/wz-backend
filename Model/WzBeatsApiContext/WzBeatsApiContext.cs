@@ -27,6 +27,8 @@ namespace WzBeatsApi.Models
       User leatherMan = new User("Legys", configuration["Env:DungeonMaster"], true) { Id = 2 };
       modelBuilder.Entity<User>().HasData(new User[] { fellaBrother, leatherMan });
 
+
+
       base.OnModelCreating(modelBuilder);
     }
   }
