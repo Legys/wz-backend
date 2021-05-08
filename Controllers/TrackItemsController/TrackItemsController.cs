@@ -26,7 +26,7 @@ namespace WzBeatsApi.Controllers
 
     // GET: api/TrackItems
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TrackItemResponse>>> GetTrackItems(string search, string genre, string mood, string sort, int bpm)
+    public async Task<ActionResult<PaginatedAsModel<TrackItemResponse>>> GetTrackItems(string search, string genre, string mood, string sort, int bpm, int page = 1, int perPage = 10)
     {
       var trackItems = from ti in _context.TrackItems
                        select ti;
@@ -61,10 +61,12 @@ namespace WzBeatsApi.Controllers
         trackItems = trackItems.Where(ti => Enumerable.Range(bpm - 7, bpm + 7).Contains(ti.Bpm));
       }
 
-      return await trackItems
+      var mappedTrackItems = trackItems
         .Include(ti => ti.Assets)
-        .Select(ti => TrackItem.MapIndexResponse(ti))
-        .ToListAsync();
+        .Select(ti => TrackItem.MapIndexResponse(ti));
+
+      return await PaginatedList<TrackItemResponse>.CreateAsync(mappedTrackItems.AsNoTracking(), page, perPage);
+
     }
 
     // GET: api/TrackItems/5
