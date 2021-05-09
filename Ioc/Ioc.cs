@@ -13,6 +13,7 @@ namespace WzBeatsApi
     public void registerServices()
     {
       this._services.AddScoped<WzBeatsApi.Controllers.UploadAssetService>();
+      this._services.AddScoped<WzBeatsApi.Controllers.UpdateTrackItem>();
     }
   }
 }
