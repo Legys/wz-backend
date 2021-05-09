@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WzBeatsApi.Models;
 using Microsoft.AspNetCore.Authorization;
-
+using AutoMapper;
 
 namespace WzBeatsApi.Controllers
 {
@@ -71,38 +71,69 @@ namespace WzBeatsApi.Controllers
 
     // GET: api/TrackItems/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<TrackItem>> GetTrackItem(long id)
+    public async Task<ActionResult<TrackItemResponse>> GetTrackItem(long id)
     {
-      var trackItem = await _context.TrackItems.FindAsync(id);
+      var trackItem = await _context.TrackItems.Include(ti => ti.Assets).FirstOrDefaultAsync(ti => ti.Id == id);
+
 
       if (trackItem == null)
       {
         return NotFound();
       }
 
-      return trackItem;
+      return TrackItem.MapIndexResponse(trackItem);
     }
 
     // PUT: api/TrackItems/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> PutTrackItem(long id, TrackItemDTO trackItemDTO)
+    public async Task<IActionResult> PutTrackItem(long id, [FromForm] TrackItemUpdate trackItemUpdated)
 
     {
-      if (id != trackItemDTO.Id)
+      if (id != trackItemUpdated.Id)
       {
         return BadRequest();
       }
 
-      // AssetItem coverAsset = await _uploadAssetService.HandleUpload(trackItemDTO.CoverAsset);
-      // AssetItem trackAsset = await _uploadAssetService.HandleUpload(trackItemDTO.TrackAsset);
-      // TrackItem trackItem = new TrackItem(trackItemDTO.Title, trackItemDTO.Description, trackItemDTO.Bpm, trackItemDTO.SongKey, trackItemDTO.Genre, trackAsset.Id, trackAsset, coverAsset.Id, coverAsset
-      // //  new List<AssetItem> { trackAsset, coverAsset }
+      var trackItem = await _context.TrackItems.Include(ti => ti.Assets).FirstOrDefaultAsync(ti => ti.Id == id);
+      var trackItemAssets = trackItem.Assets.ToList();
 
-      //  );
+      int GetAssetId(AssetType byType)
+      {
+        return trackItemAssets.ToList().FindIndex(ai => ai.Type == byType);
+      }
 
-      // _context.Entry(trackItem).State = EntityState.Modified;
+      if (trackItemUpdated.CoverAssetFile != null)
+      {
+        var oldAssetIndex = GetAssetId(AssetType.Cover);
+
+        AssetItem coverAsset = await _uploadAssetService.HandleUpload(trackItemUpdated.CoverAssetFile);
+        trackItemAssets[oldAssetIndex] = coverAsset;
+      }
+
+      if (trackItemUpdated.TrackAssetFile != null)
+      {
+        var oldAssetIndex = GetAssetId(AssetType.Track);
+
+        AssetItem trackAsset = await _uploadAssetService.HandleUpload(trackItemUpdated.TrackAssetFile);
+        trackItemAssets[oldAssetIndex] = trackAsset;
+
+      }
+
+      var config = new MapperConfiguration(cfg =>
+            {
+              cfg.CreateMap<TrackItemUpdate, TrackItem>();
+            });
+
+
+      var mapper = config.CreateMapper();
+      var updatedTrackItem = mapper.Map(trackItemUpdated, trackItem);
+
+      updatedTrackItem.Assets = trackItemAssets;
+
+      _context.Entry(trackItem).State = EntityState.Detached;
+      _context.Entry(updatedTrackItem).State = EntityState.Modified;
 
       try
       {

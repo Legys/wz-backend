@@ -20,10 +20,6 @@ namespace WzBeatsApi.Controllers
       this.AddRange(items);
     }
 
-    private static int GetTotalPages(int count, int pageSize)
-    {
-      return (int)Math.Ceiling(count / (double)pageSize);
-    }
 
     public bool HasPreviousPage
     {
@@ -40,6 +36,12 @@ namespace WzBeatsApi.Controllers
         return (PageIndex < TotalPages);
       }
     }
+
+    private static int GetTotalPages(int count, int pageSize)
+    {
+      return (int)Math.Ceiling(count / (double)pageSize);
+    }
+
 
     public static async Task<PaginatedAsModel<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize)
     {
