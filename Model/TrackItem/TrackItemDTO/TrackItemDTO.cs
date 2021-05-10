@@ -18,6 +18,7 @@ namespace WzBeatsApi.Models
     [Range(0, 200)]
     public int Bpm { get; set; }
     [Required]
+    [RegularExpression("C#m|Cm|C#|\bC|D#m|Dm|D#|\bD|G#m|Gm|G#|\bG|Am|A#m|A#|\bA|Dm|Em|\bE|F#m|Fm|F#n|F#|\bF|Bm|\bB")]
     public string SongKey { get; set; }
     [Required]
     [RegularExpression("Deep House|Trap|Reggaeton|Club House|R&B|Drum&Bass|Hip-Hop|EDM")]
