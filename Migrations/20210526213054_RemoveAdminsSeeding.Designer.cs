@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WzBeatsApi.Models;
 
 namespace wz_backend.Migrations
 {
     [DbContext(typeof(WzBeatsApiContext))]
-    partial class WzBeatsApiContextModelSnapshot : ModelSnapshot
+    [Migration("20210526213054_RemoveAdminsSeeding")]
+    partial class RemoveAdminsSeeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

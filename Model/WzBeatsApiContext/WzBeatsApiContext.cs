@@ -23,11 +23,6 @@ namespace WzBeatsApi.Models
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-      User fellaBrother = new User("WzBeats", configuration["Env:PerformanceArtist"], true) { Id = 1 };
-      User leatherMan = new User("Legys", configuration["Env:DungeonMaster"], true) { Id = 2 };
-      modelBuilder.Entity<User>().HasData(new User[] { fellaBrother, leatherMan });
-
-
 
       base.OnModelCreating(modelBuilder);
     }

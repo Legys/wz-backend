@@ -59,6 +59,11 @@ namespace WzBeatsApi
 
       app.UseRouting();
 
+      if (env.IsDevelopment())
+      {
+        app.UseCors(builder => builder.AllowAnyOrigin());
+      }
+
       app.UseAuthentication();
       app.UseAuthorization();
 

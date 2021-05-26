@@ -53,6 +53,28 @@ namespace wz_backend.Controllers.AuthController
 
     }
 
+    [HttpPost("CreateAdmins")]
+    public async Task<IActionResult> CreateAdmins(UserCreateAdmins model)
+    {
+
+      var firstAdminExists = await _context.Users.FirstOrDefaultAsync(user => user.Nickname == "WzBeats") != null;
+      var secondAdminExists = await _context.Users.FirstOrDefaultAsync(user => user.Nickname == "Legys") != null;
+
+      if (firstAdminExists && secondAdminExists)
+      {
+        return Problem("Users are already created", null, 400);
+      }
+
+      User fellaBrother = new User("WzBeats", model.FirstUserPassword, true) { Id = 1 };
+      User leatherMan = new User("Legys", model.SecondUserPassword, true) { Id = 2 };
+
+      _context.Users.Add(fellaBrother);
+      _context.Users.Add(leatherMan);
+      await _context.SaveChangesAsync();
+
+      return Ok();
+    }
+
     private async Task Authenticate(string userName, bool isAdmin)
     {
       var claims = new List<Claim>
