@@ -40,7 +40,7 @@ namespace WzBeatsApi.Models
 
     public TrackItem() { }
 
-    public TrackItem(string Title, string Description, int Bpm, string SongKey, string Genre, ICollection<AssetItem> Assets)
+    public TrackItem(string Title, string Description, int Bpm, string SongKey, string Genre, string Mood, ICollection<AssetItem> Assets)
     {
       this.Title = Title;
       this.Description = Description;
@@ -49,6 +49,7 @@ namespace WzBeatsApi.Models
       this.Genre = Genre;
       this.Assets = Assets;
       this.CreatedAt = DateTime.UtcNow;
+      this.Mood = Mood;
     }
 
     public void Update()

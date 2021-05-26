@@ -169,7 +169,7 @@ namespace WzBeatsApi.Controllers
         AssetItem coverAsset = await _uploadAssetService.HandleUpload(trackItemDTO.CoverAsset);
         AssetItem trackAsset = await _uploadAssetService.HandleUpload(trackItemDTO.TrackAsset);
         TrackItem trackItem = new TrackItem(trackItemDTO.Title, trackItemDTO.Description, trackItemDTO.Bpm, trackItemDTO.SongKey,
-          trackItemDTO.Genre, new List<AssetItem>() { trackAsset, coverAsset });
+          trackItemDTO.Genre, trackItemDTO.Mood, new List<AssetItem>() { trackAsset, coverAsset });
 
         _context.TrackItems.Add(trackItem);
 
