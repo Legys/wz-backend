@@ -40,14 +40,15 @@ namespace WzBeatsApi.Controllers
             throw new Exception("Wrong asset file extension");
 
         }
-        var storePath = Path.Combine(_appEnv.WebRootPath, webStorageAssetFolder);
-        var fullPath = storePath + file.FileName;
 
-        using (var stream = System.IO.File.Create(fullPath))
+        var staticFilePath = webStorageAssetFolder + file.FileName;
+        var storePath = Path.Combine(_appEnv.WebRootPath, staticFilePath);
+
+        using (var stream = System.IO.File.Create(storePath))
         {
           await file.CopyToAsync(stream);
 
-          AssetItem assetItem = new AssetItem(file.FileName, fileType, fullPath);
+          AssetItem assetItem = new AssetItem(file.FileName, fileType, staticFilePath);
           return assetItem;
         }
       }

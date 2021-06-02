@@ -44,17 +44,17 @@ namespace WzBeatsApi.Controllers
 
       if (genre != null)
       {
-        trackItems = trackItems.Where(ti => ti.Genre.Contains(search, StringComparison.OrdinalIgnoreCase));
+        trackItems = trackItems.Where(ti => ti.Genre.ToLower().Contains(search));
       }
 
       if (mood != null)
       {
-        trackItems = trackItems.Where(ti => ti.Mood.Contains(mood, StringComparison.OrdinalIgnoreCase));
+        trackItems = trackItems.Where(ti => ti.Mood.ToLower().Contains(mood));
       }
 
       if (search != null)
       {
-        trackItems = trackItems.Where(ti => ti.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+        trackItems = trackItems.Where(ti => ti.Title.ToLower().Contains(search.ToLower()));
       }
 
       if (bpm != 0)
