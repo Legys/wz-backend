@@ -27,7 +27,7 @@ namespace WzBeatsApi.Controllers
 
     // GET: api/TrackItems
     [HttpGet]
-    public async Task<ActionResult<PaginatedAsModel<TrackItemResponse>>> GetTrackItems(string search, string genre, string mood, string sort, int bpm, int page = 1, int perPage = 10)
+    public async Task<ActionResult<PaginatedAsModel<TrackItemResponse>>> GetTrackItems(string search, string genre, string mood, string songKey, string sort, int bpm, int page = 1, int perPage = 10)
     {
       var trackItems = from ti in _context.TrackItems
                        select ti;
@@ -42,24 +42,30 @@ namespace WzBeatsApi.Controllers
           break;
       }
 
-      if (genre != null)
-      {
-        trackItems = trackItems.Where(ti => ti.Genre.ToLower().Contains(search));
-      }
-
-      if (mood != null)
-      {
-        trackItems = trackItems.Where(ti => ti.Mood.ToLower().Contains(mood));
-      }
-
       if (search != null)
       {
         trackItems = trackItems.Where(ti => ti.Title.ToLower().Contains(search.ToLower()));
       }
 
+      if (genre != null)
+      {
+        trackItems = trackItems.Where(ti => ti.Genre.ToLower().Contains(genre.ToLower()));
+      }
+
+      if (mood != null)
+      {
+        trackItems = trackItems.Where(ti => ti.Mood.ToLower().Contains(mood.ToLower()));
+      }
+
+      if (songKey != null)
+      {
+        trackItems = trackItems.Where(ti => ti.SongKey.ToLower().Contains(songKey.ToLower()));
+      }
+
       if (bpm != 0)
       {
-        trackItems = trackItems.Where(ti => Enumerable.Range(bpm - 7, bpm + 7).Contains(ti.Bpm));
+        var allowedBpmRange = 8;
+        trackItems = trackItems.Where(ti => Enumerable.Range(bpm, allowedBpmRange).Contains(ti.Bpm));
       }
 
       var mappedTrackItems = trackItems
